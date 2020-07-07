@@ -1,4 +1,4 @@
-class HashTableEntry:
+class HashTableEntry: # similar to Node
     """
     Linked List hash table key/value pair
     """
@@ -12,7 +12,7 @@ class HashTableEntry:
 MIN_CAPACITY = 8
 
 
-class HashTable:
+class HashTable: # similar to LinkedList
     """
     A hash table that with `capacity` buckets
     that accepts string keys
@@ -23,6 +23,7 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
+        self.head = None
         if MIN_CAPACITY > capacity:
             self.data = [None] * MIN_CAPACITY
         else: 
@@ -99,9 +100,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # 
         i = self.hash_index(key)
+        entry = HashTableEntry(key, value)
+        # n.next = self.head
+        # self.head = n
+        if self.data[i] is None:
+            self.data[i] = entry
+        else:
+            # collision handle
+            pass
 
-        self.data[i] = value
 
 
     def delete(self, key):
@@ -113,9 +122,30 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        i = self.hash_index(key)
+        cur_ind = self.hash_index(key)
+        cur = self.data[cur_ind]
 
-        self.data[i] = None
+        # if cur_ind == key:
+        #     self.hash_index = self.next
+        #     current.next = None
+        #     return current
+
+        prev = cur
+        cur = cur.next
+
+        while cur is not None:
+            if cur.key == key:
+                prev.next = cur.next
+                cur.next = None
+                return cur
+            else: 
+                prev = prev.next
+                cur = cur.next
+
+        return None
+        # i = self.hash_index(key)
+
+        # self.data[i] = None
 
     def get(self, key):
         """
@@ -126,11 +156,21 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        i = self.hash_index(key)
+        cur_ind = self.hash_index(key)
+        cur = self.data[cur_ind] 
 
-        return self.data[i]
+        while cur is not None:
+            if cur.key == key:
+                return cur.value
 
-    def resize(self, new_capacity):
+            cur = cur.next
+
+        return None # we did not find it 
+    #     i = self.hash_index(key)
+
+    #     return self.data[i]
+
+    # def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
@@ -157,21 +197,30 @@ if __name__ == "__main__":
     ht.put("line_11", "So rested he by the Tumtum tree")
     ht.put("line_12", "And stood awhile in thought.")
 
+    ht.delete("line_12")
+
     print("")
 
     # Test storing beyond capacity
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    for i in range(1, 12):
+        if ht.get(f"line{i}") is not None:
+            print(ht.get(f"line_{i}").key)
+        else:
+            print(ht.get(f"line_{i}"))
+
+        print(ht.get("line_11"))
+        print(ht.get("line_1"))
+
 
     # Test resizing
-    old_capacity = ht.get_num_slots()
-    ht.resize(ht.capacity * 2)
-    new_capacity = ht.get_num_slots()
+    # old_capacity = ht.get_num_slots()
+    # ht.resize(ht.capacity * 2)
+    # new_capacity = ht.get_num_slots()
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # # Test if data intact after resizing
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
     print("")
